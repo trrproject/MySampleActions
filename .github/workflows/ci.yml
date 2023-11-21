@@ -1,0 +1,7 @@
+name: CI/CD > CI
+on:
+  workflow_call:
+  
+jobs:
+  ci:
+    name: Build and Test
