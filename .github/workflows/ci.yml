@@ -11,11 +11,26 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Restore NuGet packages dependencies
         run: |
           dotnet restore src/MySample.csproj
+
       - name: Build Project(s)
         run: |
           dotnet build src/MySample.csproj \
             -c Release \
             --no-restore
+
+      - name: Retrieve Octopus environment
+        id: environment
+        run: |
+          import os
+          import json
+          import uuid
+
+          def set_output(name, value):
+            with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+              print(f'{name}={value}', file=fh)
+              
+        shell: python
