@@ -5,3 +5,13 @@ on:
 jobs:
   ci:
     name: Build and Test
+    runs-on: [self-hosted, linux, x64]
+    steps:
+      - name: Restore NuGet packages dependencies
+        run: |
+          dotnet restore src/MySample.csproj
+      - name: Build Project(s)
+        run: |
+          dotnet build src/MySample.csproj \
+            -c Release \
+            --no-restore
