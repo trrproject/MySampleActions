@@ -1,11 +1,11 @@
 name: CI/CD
 on:
-  push:
-    branches:
-      - feature/*
-      - master
-    paths:
-      - '**'
+#  push:
+#    branches:
+#      - feature/*
+#      - master
+#    paths:
+#      - '**'
 
   workflow_dispatch:
   
