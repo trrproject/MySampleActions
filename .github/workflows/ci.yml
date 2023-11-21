@@ -5,7 +5,7 @@ on:
 jobs:
   ci:
     name: Build and Test
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     steps:
       - name: Restore NuGet packages dependencies
         run: |
