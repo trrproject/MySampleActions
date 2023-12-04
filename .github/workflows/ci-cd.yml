@@ -4,6 +4,7 @@ on:
     branches:
       - feature/*
       - master
+      - test*      
     paths:
       - 'src/**'
 
@@ -16,4 +17,5 @@ jobs:
     with: 
       project-name: ${{ vars.PROJECT_NAME }}
     secrets:
+      ado-token: ${{ secrets.BASECONE_AZURE_DEVOPS_TOKEN }}
       gha-token: ${{ secrets.MY_GITHUB_ACTIONS_PAT_PACKAGE_FEED }}
