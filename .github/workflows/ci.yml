@@ -55,12 +55,13 @@ jobs:
           if '${{ github.ref_name }}' in envs:
             set_output('environment',envs.get('${{ github.ref_name }}'))
         shell: python
+
       - name: Bump version and push tag
         if: steps.environment.outputs.is-deployable == 'True'
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.1
         with:
-          github_token: : ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           pre_release_branches: ${{ vars.VERSION_PRERELEASE_BRANCHES }}
           release_branches: ${{ vars.VERSION_RELEASE_BRANCHES }}
           tag_prefix: 'TerranProject.samples-v'
