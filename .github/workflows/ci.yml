@@ -6,10 +6,16 @@ on:
         required: true
         type: string
     secrets:
+      ado-token:
+        description: Azure DevOps access token
+        required: true      
       gha-token:
         description: GitHub Actions access token
         required: true
     outputs:
+      octo-environment:
+        description: Octopus environment to deploy to
+        value: ${{ jobs.ci.outputs.environment }}
       tag:
         value: ${{ jobs.ci.outputs.new_tag }}
       version:
@@ -20,8 +26,10 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     outputs:
+      is-deployable: ${{ steps.environment.outputs.is-deployable }}
+      environment: ${{ steps.environment.outputs.environment }}
       new_tag: ${{ steps.tag_version.outputs.new_tag }}
-      new_version: ${{ steps.tag_version.outputs.new_version }}    
+      new_version: ${{ steps.tag_version.outputs.new_version }}  
     steps:
       - name: Check-out repository
         uses: actions/checkout@v4
@@ -29,15 +37,47 @@ jobs:
           fetch-depth: 0
 
       - name: Restore NuGet packages dependencies
+        env:
+          BASECONE_NUGET_ADO_FEED_TOKEN: ${{ secrets.ado-token }}
+          BASECONE_NUGET_GHA_FEED_TOKEN: ${{ secrets.gha-token }}      
         run: |
           dotnet restore src/MySample.csproj
 
+      - name: Build Project(s)
+        run: |
+          dotnet build src/MySample.csproj \
+            -c Release \
+            --no-restore
+
+      - name: Retrieve Octopus environment
+        id: environment
+        run: |
+              import os
+              import json
+              import uuid
+    
+              def set_output(name, value):
+                with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+                  print(f'{name}={value}', file=fh)
+              
+              envs = json.loads('${{ vars.OCTOPUS_ENVIRONMENT_BY_GIT_BRANCH }}')
+              
+              set_output('is-deployable','${{ github.ref_name }}' in envs)
+    
+              if '${{ github.ref_name }}' in envs:
+                set_output('environment',envs.get('${{ github.ref_name }}'))
+        shell: python
+
       - name: Bump version and push tag
+        if: steps.environment.outputs.is-deployable == 'True'
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pre_release_branches: ${{ vars.VERSION_PRERELEASE_BRANCHES }}
           release_branches: ${{ vars.VERSION_RELEASE_BRANCHES }}
-          tag_prefix: 'TerranProject.samples-v'
+          tag_prefix: '${{ vars.PROJECT_NAME }}-v'
           append_to_pre_release_tag: 'prerelease'
+
+          # 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
+          # lnw52ayxunqpwchmlx4h5evnpgpqenadim3jf4zoh6kf3pugnxbq
