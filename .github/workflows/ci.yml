@@ -10,6 +10,9 @@ on:
         description: GitHub Actions access token
         required: true
     outputs:
+      octo-environment:
+        description: Octopus environment to deploy to
+        value: ${{ jobs.ci.outputs.environment }}      
       tag:
         value: ${{ jobs.ci.outputs.new_tag }}
       version:
