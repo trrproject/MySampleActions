@@ -20,11 +20,6 @@ jobs:
             - name: Restore dependencies
               run: dotnet restore
 
-            - name: Generate build number
-              uses: basecone/basecone-gha-buildnumber@master
-              with:
-                token: ${{ github.token }}
-
             - name: Set environment variables
               run: |
                 echo "VERSION=${{ vars.VERSION_NUMBER }}.${{ env.BUILD_NUMBER }}${{ env.VERSION_SUFFIX }}" >> $GITHUB_ENV
@@ -33,4 +28,3 @@ jobs:
                 echo "ZIP_NAME=Microservice-Template.${{ vars.VERSION_NUMBER }}.${{ env.BUILD_NUMBER }}${{ env.VERSION_SUFFIX }}.zip" >> $GITHUB_ENV
                 echo "ZIP_PATH=${{ runner.temp }}" >> $GITHUB_ENV
                 echo "PACKAGE_OUTPUT=${{ runner.temp }}/drop_mstemplate" >> $GITHUB_ENV
-                echo "BUILDNUMER=${{ github.token }}" >> $GITHUB_ENV
