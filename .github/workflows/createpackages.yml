@@ -1,0 +1,36 @@
+name: Create Package
+
+on:
+  push:
+    branches:
+      - main
+      - feature/*
+  workflow_dispatch:
+
+jobs:
+    create-package:
+        env:
+          VERSION_SUFFIX: ${{ github.ref_name != 'main' && '-prerelease' || '' }}
+        name: Create Package
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Restore dependencies
+              run: dotnet restore
+
+            - name: Generate build number
+              uses: basecone/basecone-gha-buildnumber@master
+              with:
+                token: ${{ github.token }}
+
+            - name: Set environment variables
+              run: |
+                echo "VERSION=${{ vars.VERSION_NUMBER }}.${{ env.BUILD_NUMBER }}${{ env.VERSION_SUFFIX }}" >> $GITHUB_ENV
+                echo "RELEASE_TAG_NAME=v${{ vars.VERSION_NUMBER }}.${{ env.BUILD_NUMBER }}${{ env.VERSION_SUFFIX }}" >> $GITHUB_ENV
+                echo "RELEASE_NAME=Microservice-Template v${{ vars.VERSION_NUMBER }}.${{ env.BUILD_NUMBER }}" >> $GITHUB_ENV
+                echo "ZIP_NAME=Microservice-Template.${{ vars.VERSION_NUMBER }}.${{ env.BUILD_NUMBER }}${{ env.VERSION_SUFFIX }}.zip" >> $GITHUB_ENV
+                echo "ZIP_PATH=${{ runner.temp }}" >> $GITHUB_ENV
+                echo "PACKAGE_OUTPUT=${{ runner.temp }}/drop_mstemplate" >> $GITHUB_ENV
+                echo "BUILDNUMER=${{ github.token }}" >> $GITHUB_ENV
